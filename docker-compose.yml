@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Servicio de la Base de Datos (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: orders_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: orders_db
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: db_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Servicio de nuestra API Flask
+  web:
+    build: .
+    container_name: orders_api
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - DATABASE_URL=mysql+pymysql://db_user:db_password@db:3306/orders_db
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
