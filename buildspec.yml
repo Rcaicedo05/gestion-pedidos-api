@@ -13,14 +13,14 @@ phases:
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo "REPOSITORY_URI=$REPOSITORY_URI" >> /tmp/build_env.txt
+      - echo "REPOSITORY_URI=$REPOSITORY_URI" > /tmp/build_env.txt
       - echo "IMAGE_TAG=$IMAGE_TAG" >> /tmp/build_env.txt
       - echo "Commit: $CODEBUILD_RESOLVED_SOURCE_VERSION"
 
   build:
     commands:
       - echo "======================== PHASE 2: BUILD ========================"
-      - . /tmp/build_env.txt
+      - export $(cat /tmp/build_env.txt | xargs)
       - echo "Building Docker image with tag - $REPOSITORY_URI:$IMAGE_TAG"
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
@@ -29,7 +29,7 @@ phases:
   post_build:
     commands:
       - echo "======================== PHASE 3: POST-BUILD ========================"
-      - . /tmp/build_env.txt
+      - export $(cat /tmp/build_env.txt | xargs)
       - echo "Pushing images to Amazon ECR..."
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
