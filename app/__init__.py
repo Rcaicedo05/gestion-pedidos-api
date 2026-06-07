@@ -1,6 +1,14 @@
-from app import create_app
+db.init_app(app)
+    ma.init_app(app)
 
-app = create_app()
+    with app.app_context():
+        db.create_all(checkfirst=True)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=False)
+    from app.routes import orders_bp
+    app.register_blueprint(orders_bp, url_prefix='/api')
+
+    @app.route('/health')
+    def health():
+        return {'status': 'ok'}, 200
+
+    return app
