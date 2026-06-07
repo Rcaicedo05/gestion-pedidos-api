@@ -26,4 +26,4 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Comando de inicio usando Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "3", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "3", "--timeout", "120", "run:app"]
