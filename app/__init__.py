@@ -1,24 +1,9 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
+from app import create_app, db
 
-db = SQLAlchemy()
-ma = Marshmallow()
+app = create_app()
 
-def create_app():
-    app = Flask(__name__)
+with app.app_context():
+    db.create_all(checkfirst=True)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/orders.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-    db.init_app(app)
-    ma.init_app(app)
-
-    from app.routes import orders_bp
-    app.register_blueprint(orders_bp, url_prefix='/api')
-
-    @app.route('/health')
-    def health():
-        return {'status': 'ok'}, 200
-
-    return app
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080, debug=False)
