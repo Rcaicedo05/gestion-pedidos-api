@@ -9,7 +9,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copiar dependencias desde la etapa builder
-COPY --from-builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 
 # Copiar código fuente del proyecto
 COPY app/ ./app/
