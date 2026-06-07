@@ -1,9 +1,5 @@
 version: 0.2
 
-env:
-  variables:
-    IMAGE_REPO_NAME: gestion-pedidos-api  # si no está ya en CodeBuild
-
 phases:
   install:
     runtime-versions:
@@ -26,14 +22,14 @@ phases:
 
   build:
     commands:
-      - source /tmp/env_vars
+      - . /tmp/env_vars
       - echo Construyendo la imagen Docker del proyecto...
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
-      - source /tmp/env_vars
+      - . /tmp/env_vars
       - echo Construcción exitosa. Subiendo imágenes a Amazon ECR...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
