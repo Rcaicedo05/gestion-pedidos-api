@@ -1,38 +1,30 @@
 version: 0.2
-
 phases:
   pre_build:
     commands:
-      - echo "======================== PHASE 1: PRE-BUILD ========================"
+      - echo "PHASE 1 PRE-BUILD"
       - pip install --upgrade pip
       - pip install -r requirements.txt
-      - echo "Logging into Amazon ECR..."
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo "REPOSITORY_URI=$REPOSITORY_URI" > /tmp/build_env.txt
-      - echo "IMAGE_TAG=$IMAGE_TAG" >> /tmp/build_env.txt
-
+      - echo $REPOSITORY_URI > /tmp/repo.txt
+      - echo $IMAGE_TAG > /tmp/tag.txt
   build:
     commands:
-      - echo "======================== PHASE 2: BUILD ========================"
-      - export $(cat /tmp/build_env.txt | xargs)
-      - echo "Building Docker image with tag - $REPOSITORY_URI:$IMAGE_TAG"
+      - echo "PHASE 2 BUILD"
+      - REPOSITORY_URI=$(cat /tmp/repo.txt)
+      - IMAGE_TAG=$(cat /tmp/tag.txt)
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
-      - echo "Docker image built successfully"
-
   post_build:
     commands:
-      - echo "======================== PHASE 3: POST-BUILD ========================"
-      - export $(cat /tmp/build_env.txt | xargs)
-      - echo "Pushing images to Amazon ECR..."
+      - echo "PHASE 3 POST-BUILD"
+      - REPOSITORY_URI=$(cat /tmp/repo.txt)
+      - IMAGE_TAG=$(cat /tmp/tag.txt)
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo "Preparing deployment configuration..."
       - sed -i "s|<IMAGE_URI>|$REPOSITORY_URI:$IMAGE_TAG|g" Dockerrun.aws.json
-      - echo "Deployment ready"
-
 artifacts:
   files:
     - Dockerrun.aws.json
