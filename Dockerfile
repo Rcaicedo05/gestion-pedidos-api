@@ -11,6 +11,9 @@ WORKDIR /app
 # Copiar dependencias desde la etapa builder
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 
+# Copiar ejecutables (gunicorn y otros scripts)
+COPY --from=builder /usr/local/bin /usr/local/bin
+
 # Copiar código fuente del proyecto
 COPY app/ ./app/
 COPY run.py .
