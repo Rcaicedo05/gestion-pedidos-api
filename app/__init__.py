@@ -7,10 +7,10 @@ ma = Marshmallow()
 
 def create_app():
     app = Flask(__name__)
-    
-    # Configuración base (usa SQLite local; en AWS tomará la configuración de la base de datos)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/orders.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # Configuración base
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/orders.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
     ma.init_app(app)
