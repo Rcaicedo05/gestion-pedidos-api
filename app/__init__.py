@@ -18,5 +18,9 @@ def create_app():
     # Registro de las rutas (Blueprints)
     from app.routes import orders_bp
     app.register_blueprint(orders_bp, url_prefix='/api')
-
+    
+@app.route('/health')
+    def health():
+        return {'status': 'ok'}, 200
+        
     return app
