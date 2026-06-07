@@ -20,10 +20,10 @@ COPY run.py .
 
 # Variables de entorno
 ENV FLASK_ENV=production
-ENV PORT=5000
+ENV PORT=8080
 
 # Exponer el puerto de la aplicación
-EXPOSE 5000
+EXPOSE 8080
 
 # Comando de inicio usando Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "3", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "3", "run:app"]
